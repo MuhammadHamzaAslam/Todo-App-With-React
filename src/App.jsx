@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from './Components/button';
+import Button from './Components/Button';
 import './App.css';
 
 function App() {
@@ -7,32 +7,78 @@ function App() {
   let [allTodo, setAllTodo] = useState([]);
 
   const addTodo = () => {
-    console.log('Todo Added', todo);
-    setAllTodo([...allTodo, todo]); 
-    setTodo(''); 
+    if (!todo) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Plz Add Todo",
+      });
+    }
+    else {
+      const newTodo = {
+        id: Date.now(),
+        text: todo
+      };
+      setAllTodo([...allTodo, newTodo]);
+      setTodo('');
+    }
+  };
+
+  const deleteTodo = (id) => {
+    const filteringTodo = allTodo.filter(data => data.id !== id);
+    setAllTodo(filteringTodo);
+  };
+
+  const editTodo = (id) => {
+    const todoToEdit = allTodo.find(todo => todo.id === id);
+    setTodo(todoToEdit.text);
+    const remainingTodos = allTodo.filter(todo => todo.id !== id);
+    setAllTodo(remainingTodos);
   };
 
   return (
     <>
-      <h1 className='text-center text-4xl font-bold mt-6'>Todo App With React</h1>
+      <h1 className='text-center text-4xl font-bold mt-6 text-gray-800'>
+        Todo App With React
+      </h1>
       <div className='flex justify-center items-center mt-8'>
         <input
           type="text"
           onChange={(e) => setTodo(e.target.value)}
           value={todo}
           placeholder='Add Your Todo'
-          className='border-2 border-gray-600 w-60 h-12 pl-4 rounded-lg'
+          className='border-2 border-gray-300 w-80 h-12 pl-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
         />
-        <Button onClick={addTodo} />
+        <Button
+          text='Add'
+          onClick={addTodo}
+          bgColor='bg-blue-500'
+          className='ml-4 h-12 px-6 text-white rounded-lg shadow-sm'
+        />
       </div>
-      <div className='flex justify-center '>
-        <div className='border-2 border-black h-[60vh] w-[400px] flex flex-col justify-center mt-5'>
-          {allTodo.map((data, ind) => (
-            <div key={ind} className='flex justify-between bg-gray-200 mt-3 w-[100%]'>
-              <h1 className='my-auto ms-2 font-bold text-xl'>{data}</h1>
-              <Button text='Delete' />
-            </div>
-          ))}
+      <div className='flex justify-center mt-10'>
+        <div className='border-2 overflow-y-scroll border-gray-300 h-[60vh] w-[500px] flex flex-col p-4 rounded-lg shadow-lg bg-white'>
+          {
+            allTodo.map((todo) => (
+              <div key={todo.id} className='flex justify-between items-center bg-gray-100 p-2 mt-2 rounded-lg shadow-sm'>
+                <h1 className='font-bold text-lg text-gray-800'>{todo.text}</h1>
+                <div className='flex space-x-2'>
+                  <Button
+                    text='Edit'
+                    bgColor='bg-green-500'
+                    onClick={() => editTodo(todo.id)}
+                    className='text-white h-8 px-4 rounded-lg shadow-sm'
+                  />
+                  <Button
+                    text='Delete'
+                    bgColor='bg-red-500'
+                    onClick={() => deleteTodo(todo.id)}
+                    className='text-white h-8 px-4 rounded-lg shadow-sm'
+                  />
+                </div>
+              </div>
+            ))
+          }
         </div>
       </div>
     </>
